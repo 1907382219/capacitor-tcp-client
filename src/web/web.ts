@@ -1,26 +1,35 @@
+// src/web.ts
 import { WebPlugin } from '@capacitor/core';
-import { TCPClientPlugin } from './definitions';
 
-export class TCPClientWeb extends WebPlugin implements TCPClientPlugin {
-  constructor() {
-    super({
-      name: 'TCPClient',
-      platforms: ['web']
-    });
-  }
+import type { TcpClientSendOnceOpt, TcpClientConnectOpt, TcpClientConnectResultOpt, TcpClientKeepSendOpt, TcpClientPlugin } from './definitions';
 
-  async connect(options: { host: string; port: number }): Promise<{ success: boolean }> {
-    console.log('Web implementation not available');
-    return { success: false };
-  }
 
-  async send(options: { data: string }): Promise<{ success: boolean }> {
-    console.log('Web implementation not available');
-    return { success: false };
-  }
 
-  async disconnect(): Promise<{ success: boolean }> {
-    console.log('Web implementation not available');
-    return { success: false };
-  }
-} 
+export class TcpClientWeb extends WebPlugin implements TcpClientPlugin {
+
+    async connect(options: TcpClientConnectOpt | string): Promise<TcpClientConnectResultOpt> {
+        console.log(options);
+        throw new Error('Method not implemented for web platform.');
+    }
+
+    async sendOnce(options: TcpClientSendOnceOpt): Promise<void> {
+        console.log(options);
+        throw new Error('Method not implemented for web platform.');
+    }
+
+    async keepSend(options: TcpClientKeepSendOpt): Promise<void> {
+        console.log(options);
+        throw new Error('Method not implemented for web platform.');
+    }
+
+    async stopSend(options: TcpClientConnectResultOpt): Promise<void> {
+        console.log(options);
+        throw new Error('Method not implemented for web platform.');
+    }
+
+    async disconnect(options: TcpClientConnectResultOpt): Promise<void> {
+        console.log(options);
+        throw new Error('Method not implemented for web platform.');
+    }
+
+}
