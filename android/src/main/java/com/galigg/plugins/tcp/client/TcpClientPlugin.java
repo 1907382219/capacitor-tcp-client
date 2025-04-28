@@ -115,12 +115,9 @@ public class TcpClientPlugin extends Plugin {
 
         private void startConnect() {
             notifyConnectionStateChange(false, "准备建立连接");
-            Log.e("咖喱给给", "开始运行 1");
             this.socketRuntimeThread.submit(() -> {
-                Log.e("咖喱给给", "开始运行 2");
                 // 检测是否重连
                 while (this.canConnect) {
-                    Log.e("咖喱给给", "开始循环");
                     // 检测是否重连
                     if (this.socket == null || !this.socket.isConnected() || this.socket.isClosed()) {
                         try {
@@ -136,7 +133,7 @@ public class TcpClientPlugin extends Plugin {
                             this.output = output;
                             this.canRead = true;
                             this.startReader();
-                            Log.e("咖喱给给", ip + ":" + port + "连接成功");
+                            Log.e("TcpClientPlugin", ip + ":" + port + "连接成功");
 
                             // 延迟通知：执行速度太快，外部还没有监听事件还没开始，这边就已经发出了
                             Thread.sleep(150);
@@ -147,7 +144,7 @@ public class TcpClientPlugin extends Plugin {
                             this.disconnect(false);
 
                             try {
-                                Log.e("咖喱给给", "连接失败：" + e.getMessage());
+                                Log.e("TcpClientPlugin", "连接失败：" + e.getMessage());
                                 Thread.sleep(RETRY_DURATION_DURATION);
                             } catch (Exception retryE) {}
 
@@ -158,13 +155,13 @@ public class TcpClientPlugin extends Plugin {
                     // 检测是否还在线
                     try {
                         this.output.write(0xff);
-                        Log.e("咖喱给给", "发送成功，说明还在保持连接");
+                        Log.e("TcpClientPlugin", "心跳保持");
                         Thread.sleep(RETRY_DURATION_DURATION);
                     }
                     catch (Exception e) {
                         try {
                             this.disconnect(false);
-                            Log.e("咖喱给给", "发送失败，说明已断开连接：" + e.getMessage());
+                            Log.e("TcpClientPlugin", "发送失败，已断开连接：" + e.getMessage());
                             notifyConnectionStateChange(false, "连接异常，准备重连");
                         } catch (Exception ex) {}
                     }
@@ -181,17 +178,17 @@ public class TcpClientPlugin extends Plugin {
                         String value = this.input.readLine();
                         if (value != null) {
                             notifyData(value);
-                            Log.e("咖喱给给", "读取数据为：" + value);
+                            Log.e("TcpClientPlugin", "读取数据为：" + value);
                             continue;
                         }
                         this.disconnect(false);
                         notifyConnectionStateChange(false, "服务器主动断开连接 null");
-                        Log.e("咖喱给给", "读取数据为 null，服务器主动断开连接，继续等待重连");
+                        Log.e("TcpClientPlugin", "读取数据为 null，服务器主动断开连接，继续等待重连");
                     }
                     catch (IOException e) {
                         this.disconnect(false);
                         notifyConnectionStateChange(false, "读取失败，异常内容：" + e.getMessage());
-                        Log.e("咖喱给给", "读取失败，异常内容：" + e.getMessage());
+                        Log.e("TcpClientPlugin", "读取失败，异常内容：" + e.getMessage());
                     }
                 }
             });
@@ -215,7 +212,7 @@ public class TcpClientPlugin extends Plugin {
         // 发送数据
         public String send(String value) {
             try {
-                Log.e("TCPClientPlugin:Send", "发送数据" + value);
+                Log.e("TCPClientPlugin:Send", "发送数据：" + value);
                 if (this.socket.isConnected()) {
                     this.output.write(value.getBytes());
                     this.output.flush();
@@ -224,7 +221,7 @@ public class TcpClientPlugin extends Plugin {
                     return "发送失败：未建立连接";
                 }
             } catch (Exception e) {
-                String msg = "发送数据失败" + e.getMessage();
+                String msg = "发送数据失败：" + e.getMessage();
                 Log.e("TCPClientPlugin:Send", msg);
                 return "未知错误：" + msg;
             }
@@ -241,7 +238,7 @@ public class TcpClientPlugin extends Plugin {
                         // 使用 setSoTimeout 设置一个较短的超时，强制 readLine() 尽快返回
                         this.socket.setSoTimeout(100);
                     } catch (Exception e) {
-                        Log.e("咖喱给给", "设置超时失败: " + e.getMessage());
+                        Log.e("TcpClientPlugin", "设置超时失败: " + e.getMessage());
                     }
                     
                     // 等待一小段时间，让读取线程有机会退出
@@ -251,9 +248,7 @@ public class TcpClientPlugin extends Plugin {
                     
                     // 然后再关闭连接
                     try {
-                        Log.e("咖喱给给", "关闭socket连接");
                         if (this.output != null) {
-                            Log.e("咖喱给给", "output.close");
                             this.output.close();
                             this.output = null;
                         }
@@ -264,12 +259,11 @@ public class TcpClientPlugin extends Plugin {
                         }
                         
                         if (this.input != null) {
-                            Log.e("咖喱给给", "input.close");
                             this.input.close();
                             this.input = null;
                         }
                     } catch (Exception e) {
-                        Log.e("咖喱给给", "关闭连接异常: " + e.getMessage());
+                        Log.e("TcpClientPlugin", "关闭连接异常: " + e.getMessage());
                     }
                 }
 
@@ -278,21 +272,18 @@ public class TcpClientPlugin extends Plugin {
                 if (destroy) {
                     this.canConnect = false;
 
-                    Log.e("咖喱给给", "关闭Reader线程");
                     if (this.socketReaderThread != null) {
                         this.socketReaderThread.shutdown();
                         this.socketReaderThread = null;
                     }
-                    Log.e("咖喱给给", "关闭Socket线程");
                     if (this.socketRuntimeThread != null) {
                         this.socketRuntimeThread.shutdown();
                         this.socketRuntimeThread = null;
                     }
                 }
 
-                Log.e("咖喱给给", "停止销毁，destroy：" + destroy + "；this.canConnect：" + this.canConnect);
             } catch (Exception e) {
-                Log.e("TCPClientMark", "disconnect 异常" + e.getMessage());
+                Log.e("TcpClientPlugin", "disconnect 异常" + e.getMessage());
             }
         }
 
@@ -362,7 +353,7 @@ public class TcpClientPlugin extends Plugin {
         long duration = call.getInt("duration", 0);
         String data = call.getString("data", "");
 
-        Log.e("咖喱给给", "发送内容：data-" + data + "; connect_id-" + connectId);
+        Log.e("TcpClientPlugin", "发送内容：data-" + data + "; connect_id-" + connectId);
 
         if (connectId == 0) {
             call.reject("缺少ConnectID参数");
@@ -390,7 +381,7 @@ public class TcpClientPlugin extends Plugin {
                 () -> {
                     try {
                         cache.connection.send(data);
-                        Log.e("咖喱给给", "发送内容：data-" + data + "; connect_id-" + connectId + "; duration-" + duration);
+                        Log.e("TcpClientPlugin", "发送内容：data-" + data + "; connect_id-" + connectId + "; duration-" + duration);
                     } catch (Exception e) {
                         call.reject("发送失败，请及时调用 stopSend 方法结束触发：" + e.getMessage());
                     }
@@ -418,47 +409,47 @@ public class TcpClientPlugin extends Plugin {
     // 断开连接
     @PluginMethod()
     public void disconnect(PluginCall call) {
-        Log.e("咖喱给给", "断开连接成功 1");
+        Log.e("TcpClientPlugin", "断开连接成功 1");
         int connectId = call.getInt("connect_id", 0);
         if (connectId == 0) {
             return;
         }
 
-        Log.e("咖喱给给", "断开连接成功 2");
+        Log.e("TcpClientPlugin", "断开连接成功 2");
 
         ConnectionCache cache = this.connections.get(connectId);
-        Log.e("咖喱给给", "断开连接成功 3");
+        Log.e("TcpClientPlugin", "断开连接成功 3");
         if (cache == null) {
             call.reject("找不到Socket实例");
             return;
         }
-        Log.e("咖喱给给", "断开连接成功 4");
+        Log.e("TcpClientPlugin", "断开连接成功 4");
 
         try {
-            Log.e("咖喱给给", "断开连接成功 4.1");
+            Log.e("TcpClientPlugin", "断开连接成功 4.1");
             this.deleteSendScheduledTask(connectId);
-            Log.e("咖喱给给", "断开连接成功 4.2");
+            Log.e("TcpClientPlugin", "断开连接成功 4.2");
             cache.connection.disconnect(true);
-            Log.e("咖喱给给", "断开连接成功 4.3");
+            Log.e("TcpClientPlugin", "断开连接成功 4.3");
             this.connections.remove(connectId);
-            Log.e("咖喱给给", "断开连接成功 5");
+            Log.e("TcpClientPlugin", "断开连接成功 5");
             JSObject result = new JSObject();
             result.put("data", "连接 connect_id: "+ connectId + "; ip: " + cache.connection.ip + "成功断开");
-            Log.e("咖喱给给", "断开连接成功 6");
+            Log.e("TcpClientPlugin", "断开连接成功 6");
             call.resolve(result);
-            Log.e("咖喱给给", "断开连接成功");
+            Log.e("TcpClientPlugin", "断开连接成功");
         } catch (Exception e) {
-            Log.e("咖喱给给", "断开连接成功 7");
+            Log.e("TcpClientPlugin", "断开连接成功 7");
             call.reject("连接：connectId" + "断开失败；异常：" + e.getMessage());
-            Log.e("咖喱给给", "断开连接成功 8");
-            Log.e("咖喱给给", "断开失败：" + e.getMessage());
+            Log.e("TcpClientPlugin", "断开连接成功 8");
+            Log.e("TcpClientPlugin", "断开失败：" + e.getMessage());
         }
 
     }
 
     @Override
     protected void handleOnDestroy() {
-        Log.e("咖喱给给", "销毁插件");
+        Log.e("TcpClientPlugin", "销毁插件");
         for (ConnectionCache cache : this.connections.values()) {
             try {
                 cache.connection.canConnect = cache.connection.canRead = false;

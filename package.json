@@ -1,6 +1,6 @@
 {
   "name": "capacitor-tcp-client-android",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "一个用于 Android 平台的 Capacitor TCP 客户端插件。",
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -10,7 +10,7 @@
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
-  "author": "",
+  "author": "GaliGG_CC",
   "license": "ISC",
   "dependencies": {
     "@capacitor/core": "^5.0.0"
