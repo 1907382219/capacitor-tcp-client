@@ -1,4 +1,4 @@
-# Capacitor TCP Client
+# Capacitor TCP Client Android
 
 A Capacitor plugin for TCP client functionality on Android platform.
 
@@ -7,13 +7,13 @@ A Capacitor plugin for TCP client functionality on Android platform.
 ## Installation | 安装
 
 ```bash
-npm install capacitor-tcp-client
+npm install capacitor-tcp-client-android
 ```
 
 ## Usage | 使用方法
 
 ```typescript
-import { TcpClient } from 'capacitor-tcp-client';
+import { TcpClient } from 'capacitor-tcp-client-android';
 
 // Connect to a TCP server
 // 连接到 TCP 服务器
