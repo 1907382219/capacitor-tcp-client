@@ -23,7 +23,8 @@
   "files": [
     "dist/",
     "ios/",
-    "android/",
+    "android/src/main/",
+    "android/build.gradle",
     "CapacitorTcpClient.podspec"
   ],
   "keywords": [
