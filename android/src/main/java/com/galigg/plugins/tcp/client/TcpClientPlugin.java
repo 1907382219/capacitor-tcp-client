@@ -10,15 +10,13 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.PrintWriter;
 
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.net.InetSocketAddress;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * TCP Socket插件
@@ -44,6 +43,9 @@ public class TcpClientPlugin extends Plugin {
         public ConnectionTask connection;
         public ScheduledFuture sendScheduledTask;
     }
+
+    // 默认缓冲区大小（8KB）
+    private static final int DEFAULT_BUFFER_SIZE = 8192;
 
     // 重新建立连接延迟 ms
     private final long RETRY_DURATION_DURATION = 2340;
@@ -100,9 +102,9 @@ public class TcpClientPlugin extends Plugin {
         // 当前Socket连接的实例
         private Socket socket;
         // 当前Socket连接的输入流
-        private BufferedReader input;
+        private DataInputStream input;
         // 当前Socket连接的输出流
-        private OutputStream output;
+        private DataOutputStream output;
 
         // 如果没有ConnectID就开启一个新连接实例
         ConnectionTask(String ip, int port) {
@@ -125,8 +127,8 @@ public class TcpClientPlugin extends Plugin {
                             Socket socket = new Socket();
                             socket.connect(new InetSocketAddress(ip, port), 1000);
                             socket.setKeepAlive(true);
-                            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                            OutputStream output = socket.getOutputStream();
+                            DataInputStream input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                            DataOutputStream output = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 
                             this.socket = socket;
                             this.input = input;
@@ -175,15 +177,17 @@ public class TcpClientPlugin extends Plugin {
             this.socketReaderThread.submit(() -> {
                 while (canRead) {
                     try {
-                        String value = this.input.readLine();
-                        if (value != null) {
-                            notifyData(value);
-                            Log.e("TcpClientPlugin", "读取数据为：" + value);
+                        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                        int readBytes = this.input.read(buffer);
+                        if (readBytes == -1) {
+                            this.disconnect(false);
+                            notifyConnectionStateChange(false, "服务器主动断开连接 null");
+                            Log.e("TcpClientPlugin", "读取数据为 null，服务器主动断开连接，继续等待重连");
                             continue;
                         }
-                        this.disconnect(false);
-                        notifyConnectionStateChange(false, "服务器主动断开连接 null");
-                        Log.e("TcpClientPlugin", "读取数据为 null，服务器主动断开连接，继续等待重连");
+                        String value = new String(buffer, 0, readBytes);
+                        notifyData(value);
+                        Log.e("TcpClientPlugin", "读取数据为：" + value);
                     }
                     catch (IOException e) {
                         this.disconnect(false);

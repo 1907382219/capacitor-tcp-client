@@ -1,6 +1,6 @@
 {
   "name": "capacitor-tcp-client-android",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "一个用于 Android 平台的 Capacitor TCP 客户端插件。",
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -21,10 +21,9 @@
     "typescript": "^4.9.5"
   },
   "files": [
-    "dist/",
-    "ios/",
     "android/src/main/",
     "android/build.gradle",
+    "dist/",
     "CapacitorTcpClient.podspec"
   ],
   "keywords": [
