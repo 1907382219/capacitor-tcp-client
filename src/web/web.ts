@@ -1,7 +1,7 @@
 // src/web.ts
 import { WebPlugin } from '@capacitor/core';
 
-import type { TcpClientSendOnceOpt, TcpClientConnectOpt, TcpClientConnectResultOpt, TcpClientKeepSendOpt, TcpClientPlugin } from './definitions';
+import type { TcpClientSendOnceOpt, TcpClientConnectOpt, TcpClientConnectResultOpt, TcpClientKeepSendOpt, TcpClientPlugin, TcpClientSendResult } from './definitions';
 
 
 
@@ -12,7 +12,7 @@ export class TcpClientWeb extends WebPlugin implements TcpClientPlugin {
         throw new Error('Method not implemented for web platform.');
     }
 
-    async sendOnce(options: TcpClientSendOnceOpt): Promise<void> {
+    async sendOnce(options: TcpClientSendOnceOpt): Promise<TcpClientSendResult> {
         console.log(options);
         throw new Error('Method not implemented for web platform.');
     }

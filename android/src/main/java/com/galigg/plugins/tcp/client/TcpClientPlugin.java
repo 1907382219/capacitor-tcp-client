@@ -214,20 +214,28 @@ public class TcpClientPlugin extends Plugin {
         }
 
         // 发送数据
-        public String send(String value) {
+        public JSObject send(String value) {
+            JSObject result = new JSObject();
+            result.put("connect_id", connectId);
             try {
                 Log.e("TCPClientPlugin:Send", "发送数据：" + value);
                 if (this.socket.isConnected()) {
                     this.output.write(value.getBytes());
                     this.output.flush();
-                    return "发送成功";
+                    result.put("success", true);
+                    result.put("message", "发送成功");
+                    return result;
                 } else {
-                    return "发送失败：未建立连接";
+                    result.put("success", false);
+                    result.put("message", "发送失败：未建立连接");
+                    return result;
                 }
             } catch (Exception e) {
                 String msg = "发送数据失败：" + e.getMessage();
                 Log.e("TCPClientPlugin:Send", msg);
-                return "未知错误：" + msg;
+                result.put("success", false);
+                result.put("message", msg);
+                return result;
             }
         }
 
@@ -342,8 +350,8 @@ public class TcpClientPlugin extends Plugin {
         }
 
         try {
-            cache.connection.send(data);
-            call.resolve();
+            JSObject result = cache.connection.send(data);
+            call.resolve(result);
         } catch (Exception e) {
             call.reject("发送失败：" + e.getMessage());
         }

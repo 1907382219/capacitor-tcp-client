@@ -77,7 +77,7 @@ Connect to a TCP server.
 - connected: 连接状态
 - data: 连接信息
 
-### sendOnce(options: TCPClientSendOnceOpt): Promise<void>
+### sendOnce(options: TCPClientSendOnceOpt): Promise<TcpClientSendResult>
 
 Send data once to the connected server.
 
@@ -86,6 +86,11 @@ Send data once to the connected server.
 参数说明：
 - connect_id: 连接 ID
 - data: 要发送的数据内容
+
+返回值：
+- connect_id: 连接 ID，用于后续操作
+- success: 是否发送成功
+- message: 发送结果描述
 
 ### keepSend(options: TCPClientKeepSendOpt): Promise<void>
 

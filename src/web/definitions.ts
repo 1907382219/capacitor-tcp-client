@@ -33,13 +33,19 @@ export interface TcpClientDataEvent {
     connect_id: number;
     data: string;
 }
+
+export interface TcpClientSendResult {
+    connect_id: number;
+    success: boolean;
+    message: string;
+}
     
 
 export interface TcpClientPlugin {
     
     connect(options: TcpClientConnectOpt): Promise<TcpClientConnectResultOpt>;
 
-    sendOnce(options: TcpClientSendOnceOpt): Promise<void>;
+    sendOnce(options: TcpClientSendOnceOpt): Promise<TcpClientSendResult>;
 
     keepSend(options: TcpClientKeepSendOpt): Promise<void>;
 
